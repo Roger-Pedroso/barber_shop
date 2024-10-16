@@ -1,0 +1,54 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Defina a variável de ambiente DATABASE_URL no seu .env
+}
+
+model BarberShop {
+  id       Int      @id @default(autoincrement())
+  name     String
+  barbers  Barber[]
+  services Service[]
+}
+
+model Barber {
+  id         Int         @id @default(autoincrement())
+  name       String
+  barberShop BarberShop  @relation(fields: [barberShopId], references: [id])
+  barberShopId Int
+  services   Service[]   @relation("BarberServices")
+  Appointment Appointment[]
+}
+
+model Service {
+  id           Int        @id @default(autoincrement())
+  name         String
+  price        Float
+  duration     Int        // Duração em minutos
+  barberShop   BarberShop @relation(fields: [barberShopId], references: [id])
+  barberShopId Int
+  barbers      Barber[]   @relation("BarberServices")
+  appointments  Appointment[] @relation("AppointmentServices")
+}
+
+model Appointment {
+  id                Int       @id @default(autoincrement())
+  appointmentDate   DateTime
+  barber            Barber    @relation(fields: [barberId], references: [id])
+  barberId         Int
+  client           Client     @relation(fields: [clientId], references: [id])
+  clientId        Int
+  services         Service[]  @relation("AppointmentServices")
+}
+
+model Client {
+  id         Int          @id @default(autoincrement())
+  name       String
+  phone      String
+  appointments Appointment[]
+}
