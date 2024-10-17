@@ -9,7 +9,12 @@ export class BarberController {
 
   @Post()
   async create(
-    @Body() barberData: { name: string; barberShopId: number },
+    @Body()
+    barberData: {
+      name: string;
+      barberShopId: number;
+      imageUrl: string;
+    },
   ): Promise<Barber> {
     return this.barberService.create(barberData);
   }

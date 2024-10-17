@@ -10,45 +10,49 @@ datasource db {
 }
 
 model BarberShop {
-  id       Int      @id @default(autoincrement())
+  id       Int       @id @default(autoincrement())
   name     String
+  address  String
+  fone     String
+  imageUrl String?
   barbers  Barber[]
   services Service[]
 }
 
 model Barber {
-  id         Int         @id @default(autoincrement())
-  name       String
-  barberShop BarberShop  @relation(fields: [barberShopId], references: [id])
+  id           Int           @id @default(autoincrement())
+  name         String
+  imageUrl     String?
+  barberShop   BarberShop    @relation(fields: [barberShopId], references: [id])
   barberShopId Int
-  services   Service[]   @relation("BarberServices")
-  Appointment Appointment[]
+  services     Service[]     @relation("BarberServices")
+  Appointment  Appointment[]
 }
 
 model Service {
-  id           Int        @id @default(autoincrement())
+  id           Int           @id @default(autoincrement())
   name         String
   price        Float
-  duration     Int        // Duração em minutos
-  barberShop   BarberShop @relation(fields: [barberShopId], references: [id])
+  duration     Int // Duração em minutos
+  barberShop   BarberShop    @relation(fields: [barberShopId], references: [id])
   barberShopId Int
-  barbers      Barber[]   @relation("BarberServices")
-  appointments  Appointment[] @relation("AppointmentServices")
+  barbers      Barber[]      @relation("BarberServices")
+  appointments Appointment[] @relation("AppointmentServices")
 }
 
 model Appointment {
-  id                Int       @id @default(autoincrement())
-  appointmentDate   DateTime
-  barber            Barber    @relation(fields: [barberId], references: [id])
-  barberId         Int
-  client           Client     @relation(fields: [clientId], references: [id])
+  id              Int       @id @default(autoincrement())
+  appointmentDate DateTime
+  barber          Barber    @relation(fields: [barberId], references: [id])
+  barberId        Int
+  client          Client    @relation(fields: [clientId], references: [id])
   clientId        Int
-  services         Service[]  @relation("AppointmentServices")
+  services        Service[] @relation("AppointmentServices")
 }
 
 model Client {
-  id         Int          @id @default(autoincrement())
-  name       String
-  phone      String
+  id           Int           @id @default(autoincrement())
+  name         String
+  phone        String
   appointments Appointment[]
 }

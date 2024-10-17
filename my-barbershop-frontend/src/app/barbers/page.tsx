@@ -6,7 +6,7 @@ import { Servico } from "../services/page";
 export interface Barbeiro {
   id: number;
   name: string;
-  specialization: string;
+  imageUrl: string;
   services: Servico[];
 }
 
@@ -31,7 +31,6 @@ export default function Barbeiros() {
         {barbeiros.map((barbeiro) => (
           <li key={barbeiro.id}>
             <h2>{barbeiro.name}</h2>
-            <p>Especialidade: {barbeiro.specialization}</p>
             <h3>Serviços: </h3>
             {barbeiro.services.map((servico) => {
               return (

@@ -7,12 +7,17 @@ import { Barber } from '@prisma/client';
 export class BarberService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(data: { name: string; barberShopId: number }): Promise<Barber> {
-    const { name, barberShopId } = data;
+  async create(data: {
+    name: string;
+    barberShopId: number;
+    imageUrl: string;
+  }): Promise<Barber> {
+    const { name, barberShopId, imageUrl } = data;
 
     return this.prisma.barber.create({
       data: {
         name,
+        imageUrl,
         barberShop: { connect: { id: barberShopId } },
       },
     });
