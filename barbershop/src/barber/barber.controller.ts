@@ -14,6 +14,8 @@ export class BarberController {
       name: string;
       barberShopId: number;
       imageUrl: string;
+      email: string;
+      fone: string;
     },
   ): Promise<Barber> {
     return this.barberService.create(barberData);

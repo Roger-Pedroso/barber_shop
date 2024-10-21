@@ -1,7 +1,7 @@
 "use client";
 
+import { Servico } from "@/app/admin/services/page";
 import { useEffect, useState } from "react";
-import { Servico } from "../services/page";
 
 export interface Barbeiro {
   id: number;
@@ -15,9 +15,8 @@ export default function Barbeiros() {
 
   useEffect(() => {
     async function fetchBarbeiros() {
-      const res = await fetch("http://localhost:3001/barbers"); // URL do Strapi
+      const res = await fetch("http://localhost:3001/barbers");
       const data = await res.json();
-      console.log("data", data);
 
       setBarbeiros(data);
     }

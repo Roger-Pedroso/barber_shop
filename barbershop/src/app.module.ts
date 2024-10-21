@@ -4,11 +4,15 @@ import { BarberShopModule } from './barbershop/barbershop.module';
 import { PrismaService } from './prisma.service';
 import { AppointmentModule } from './appointment/appointment.module';
 import { BarberServiceModule } from './barber_service/barber_service.module';
-import { ClientModule } from './client/client.module';
 import { BarberModule } from './barber/barber.module';
 
 @Module({
-  imports: [BarberShopModule, AppointmentModule, BarberServiceModule, ClientModule, BarberModule],
+  imports: [
+    BarberShopModule,
+    AppointmentModule,
+    BarberServiceModule,
+    BarberModule,
+  ],
   providers: [PrismaService],
 })
 export class AppModule {}

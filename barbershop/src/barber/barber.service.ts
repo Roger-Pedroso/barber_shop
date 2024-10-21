@@ -11,13 +11,17 @@ export class BarberService {
     name: string;
     barberShopId: number;
     imageUrl: string;
+    email: string;
+    fone: string;
   }): Promise<Barber> {
-    const { name, barberShopId, imageUrl } = data;
+    const { name, barberShopId, imageUrl, email, fone } = data;
 
     return this.prisma.barber.create({
       data: {
         name,
         imageUrl,
+        email,
+        fone,
         barberShop: { connect: { id: barberShopId } },
       },
     });

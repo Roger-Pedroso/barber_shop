@@ -10,10 +10,12 @@ export class AppointmentService {
   async create(data: {
     appointmentDate: Date;
     barberId: number;
-    clientId: number;
+    clientName: string;
+    clientFone: string;
     serviceIds: number[];
   }): Promise<Appointment> {
-    const { appointmentDate, barberId, clientId, serviceIds } = data;
+    const { appointmentDate, barberId, serviceIds, clientFone, clientName } =
+      data;
     console.log(
       'data',
       data.serviceIds.map((id) => ({ id })),
@@ -22,8 +24,9 @@ export class AppointmentService {
     return this.prisma.appointment.create({
       data: {
         appointmentDate,
+        clientFone,
+        clientName,
         barber: { connect: { id: barberId } },
-        client: { connect: { id: clientId } },
         services: {
           connect: serviceIds.map((id) => ({ id })), // Associando serviços
         },
@@ -35,7 +38,6 @@ export class AppointmentService {
     return this.prisma.appointment.findMany({
       include: {
         barber: true, // Incluir barbeiro na consulta
-        client: true, // Incluir cliente na consulta
         services: true, // Incluir serviços associados
       },
     });

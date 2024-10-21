@@ -13,7 +13,8 @@ export class AppointmentController {
     appointmentData: {
       appointmentDate: Date;
       barberId: number;
-      clientId: number;
+      clientName: string;
+      clientFone: string;
       serviceIds: number[];
     },
   ): Promise<Appointment> {

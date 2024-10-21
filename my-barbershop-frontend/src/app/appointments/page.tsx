@@ -1,15 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Barbeiro } from "../barbers/page";
-import { Servico } from "../services/page";
+import { Barbeiro } from "../admin/barbers/page";
+import { Servico } from "../admin/services/page";
 
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
 
-// import "./style.css";
 export interface Barbearia {
   id: number;
   name: string;
@@ -31,7 +31,7 @@ export default function Agendamento() {
   const [selectedHour, setSelectedHour] = useState<string | null>(null);
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [clientName, setClientName] = useState("");
-  const [clientPhone, setClientPhone] = useState("");
+  const [clientFone, setClientFone] = useState("");
 
   // cadastrar agendamento
   const handleAgendamento = async () => {
@@ -44,7 +44,8 @@ export default function Agendamento() {
         appointmentDate: new Date(
           selectedDate!.setHours(Number(horas), Number(minutos), 0)
         ),
-        clientId: 1,
+        clientName,
+        clientFone,
         // service_status: "Agendado",
       };
 
@@ -128,7 +129,7 @@ export default function Agendamento() {
         selectedServicos,
         selectedDate,
         clientName,
-        clientPhone,
+        clientFone,
         selectedHour,
       });
       alert("Agendamento realizado com sucesso!");
@@ -152,7 +153,7 @@ export default function Agendamento() {
 
       if (step === 4) {
         setClientName("");
-        setClientPhone("");
+        setClientFone("");
         setStep(3);
       }
       // setStep(step - 1);
@@ -181,6 +182,13 @@ export default function Agendamento() {
         width: "100%",
       }}
     >
+      {window.innerWidth > 1000 && (
+        <div className="self-end m-3">
+          <Link href="/admin">
+            <Button>Entrar</Button>
+          </Link>
+        </div>
+      )}
       <div
         style={{
           display: "flex",
@@ -481,8 +489,8 @@ export default function Agendamento() {
               <div className="flex self-start w-full">
                 <Input
                   type="text"
-                  value={clientPhone}
-                  onChange={(e) => setClientPhone(e.target.value)}
+                  value={clientFone}
+                  onChange={(e) => setClientFone(e.target.value)}
                   placeholder="Telefone"
                 />
               </div>
