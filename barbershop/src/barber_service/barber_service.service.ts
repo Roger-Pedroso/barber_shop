@@ -25,9 +25,6 @@ export class BarberServiceService {
 
   async findAll(): Promise<Service[]> {
     return this.prisma.service.findMany({
-      include: {
-        barbers: true, // Incluir barbeiros associados
-      },
       orderBy: {
         name: 'asc',
       },

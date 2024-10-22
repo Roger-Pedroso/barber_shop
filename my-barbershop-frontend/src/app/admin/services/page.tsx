@@ -29,6 +29,7 @@ export interface Servico {
   price: string;
   duration: string;
   active: boolean;
+  checked?: boolean;
 }
 
 export interface newService {

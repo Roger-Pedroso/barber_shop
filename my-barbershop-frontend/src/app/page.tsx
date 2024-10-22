@@ -260,19 +260,21 @@ export default function Agendamento() {
                     gap: "10px",
                   }}
                 >
-                  <Image
-                    src={barbeiro.imageUrl}
-                    alt={barbeiro.name}
-                    width={100}
-                    height={100}
-                    style={{
-                      borderRadius: "20%",
-                      maxWidth: "100px",
-                      maxHeight: "100px",
-                      minHeight: "100px",
-                      minWidth: "100px",
-                    }}
-                  />
+                  {barbeiro.imageUrl && (
+                    <Image
+                      src={barbeiro.imageUrl}
+                      alt={barbeiro.name}
+                      width={100}
+                      height={100}
+                      style={{
+                        borderRadius: "20%",
+                        maxWidth: "100px",
+                        maxHeight: "100px",
+                        minHeight: "100px",
+                        minWidth: "100px",
+                      }}
+                    />
+                  )}
                   <h3>{barbeiro.name}</h3>
                 </div>
               ))}
