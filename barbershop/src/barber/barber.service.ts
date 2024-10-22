@@ -30,7 +30,11 @@ export class BarberService {
   async findAll(): Promise<Barber[]> {
     return this.prisma.barber.findMany({
       include: {
-        services: true, // Incluir serviços na consulta
+        services: {
+          where: {
+            active: true,
+          },
+        },
       },
     });
   }

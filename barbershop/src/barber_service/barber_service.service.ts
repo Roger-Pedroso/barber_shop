@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateBarberServiceDto } from './dto/create-barber_service.dto';
 import { Service } from '@prisma/client';
+import { UpdateBarberServiceDto } from './dto/update-barber_service.dto';
 
 @Injectable()
 export class BarberServiceService {
@@ -27,6 +28,18 @@ export class BarberServiceService {
       include: {
         barbers: true, // Incluir barbeiros associados
       },
+      orderBy: {
+        name: 'asc',
+      },
+    });
+  }
+
+  async update(id: number, data: UpdateBarberServiceDto): Promise<Service> {
+    return this.prisma.service.update({
+      where: {
+        id,
+      },
+      data,
     });
   }
 }

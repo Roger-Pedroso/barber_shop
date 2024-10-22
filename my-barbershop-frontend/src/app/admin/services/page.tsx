@@ -20,48 +20,191 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { TrashIcon, Pencil2Icon } from "@radix-ui/react-icons";
+import { Pencil2Icon } from "@radix-ui/react-icons";
 import { useEffect, useState } from "react";
 
 export interface Servico {
   id: number;
   name: string;
-  description: string;
   price: string;
   duration: string;
   active: boolean;
 }
 
+export interface newService {
+  name: string;
+  price: string;
+  duration: string;
+}
+
 export default function Servicos() {
   const [servicos, setServicos] = useState<Servico[]>([]);
+  const [newService, setNewService] = useState<newService | null>(null);
   const [serviceToUpdate, setServiceToUpdate] = useState<Servico | null>(null);
 
-  useEffect(() => {
-    async function fetchServicos() {
-      const res = await fetch("http://localhost:3001/barber-service");
-      const data = await res.json();
-      console.log("data", data);
+  const fetchServicos = async () => {
+    const res = await fetch("http://localhost:3001/barber-service");
+    const data = await res.json();
 
-      setServicos(data);
-    }
+    setServicos(data);
+  };
+
+  useEffect(() => {
     fetchServicos();
   }, []);
 
-  const updateServiceField = (field: keyof Servico, value: string) => {
+  const updateServiceField = (
+    field: keyof Servico,
+    value: string | boolean
+  ) => {
     setServiceToUpdate((prevService) =>
       prevService ? { ...prevService, [field]: value } : null
     );
   };
 
-  const handleUpdate = async (id: number) => {
-    console.log(id);
+  const updateNewServiceField = (
+    field: keyof Servico,
+    value: string | boolean
+  ) => {
+    setNewService((prevService) =>
+      prevService ? { ...prevService, [field]: value } : null
+    );
   };
 
-  console.log("SADASDASd", serviceToUpdate);
+  const handleUpdate = async (id: number) => {
+    const dataToUpdate = {
+      active: serviceToUpdate?.active,
+      duration: Number(serviceToUpdate?.duration),
+      price: Number(serviceToUpdate?.price),
+      name: serviceToUpdate?.name,
+    };
+    try {
+      const res = await fetch(`http://localhost:3001/barber-service/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataToUpdate),
+      });
+
+      if (res.status === 200) {
+        setServiceToUpdate(null);
+        fetchServicos();
+      }
+    } catch (error) {
+      console.log("Erro ao atulaizar serviço", error);
+    }
+  };
+
+  const handleCreate = async () => {
+    const newServiceData = {
+      name: newService?.name,
+      price: Number(newService?.price),
+      duration: Number(newService?.duration),
+      barberShopId: 1, //TO DO PEGAR DO USUARIO LOGADO
+    };
+
+    try {
+      const res = await fetch("http://localhost:3001/barber-service", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newServiceData),
+      });
+
+      if (res.status === 201) {
+        setNewService(null);
+        fetchServicos();
+      }
+    } catch (error) {
+      console.log("Erro ao criar serviço", error);
+    }
+  };
 
   return (
     <div className="p-5">
-      <h1 className="text-3xl text-black font-bold">Serviços</h1>
+      <div className="flex justify-between pb-3">
+        <h1 className="text-3xl text-black font-bold">Serviços</h1>
+        <Dialog>
+          <DialogTrigger>
+            <Button
+              variant={"outline"}
+              onClick={() =>
+                setNewService({ name: "", price: "", duration: "" })
+              }
+            >
+              Cadastrar Serviço
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Cadastrar Serviço</DialogTitle>
+              <DialogDescription>
+                <div>
+                  <Label htmlFor="new-service-name">Descrição</Label>
+                  <Input
+                    id="new-service-name"
+                    type="text"
+                    value={newService?.name}
+                    onChange={(e) =>
+                      updateNewServiceField("name", e.target.value)
+                    }
+                  />
+                  <Label htmlFor="new-service-price">Preço</Label>
+                  <Input
+                    id="new-service-price"
+                    type="number"
+                    value={newService?.price}
+                    onChange={(e) =>
+                      updateNewServiceField("price", e.target.value)
+                    }
+                  />
+                  <Label htmlFor="new-service-duration">Duração</Label>
+                  <Input
+                    id="new-service-duration"
+                    type="number"
+                    value={newService?.duration}
+                    onChange={(e) =>
+                      updateNewServiceField("duration", e.target.value)
+                    }
+                  />
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    alignSelf: "end",
+                    gap: "10px",
+                    marginTop: "20px",
+                  }}
+                >
+                  <div>
+                    <DialogTrigger>
+                      <Button
+                        variant={"secondary"}
+                        onClick={() => setNewService(null)}
+                      >
+                        Cancelar
+                      </Button>
+                    </DialogTrigger>
+                  </div>
+                  <div>
+                    <DialogTrigger>
+                      <Button
+                        onClick={() => {
+                          handleCreate();
+                        }}
+                      >
+                        Continuar
+                      </Button>
+                    </DialogTrigger>
+                  </div>
+                </div>
+              </DialogDescription>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
+      </div>
       <div style={{ backgroundColor: "black" }}>
         <Table>
           <TableHeader>
@@ -154,12 +297,15 @@ export default function Servicos() {
                               </DialogTrigger>
                             </div>
                             <div>
-                              <Button
-                                onClick={() => {}}
-                                // disabled={selectedServicos.length === 0}
-                              >
-                                Continuar
-                              </Button>
+                              <DialogTrigger>
+                                <Button
+                                  onClick={() => {
+                                    handleUpdate(servico.id);
+                                  }}
+                                >
+                                  Continuar
+                                </Button>
+                              </DialogTrigger>
                             </div>
                           </div>
                         </DialogDescription>
@@ -171,10 +317,7 @@ export default function Servicos() {
             ))}
           </TableBody>
         </Table>
-        {/* <DialogTrigger>Open</DialogTrigger> */}
       </div>
-
-      <div></div>
     </div>
   );
 }
