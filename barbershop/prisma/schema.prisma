@@ -43,19 +43,19 @@ model BarberShop {
 }
 
 model Barber {
-  id       Int     @id @default(autoincrement())
-  name     String
-  fone     String
-  role     role    @default(Barber)
-  email    String?
-  imageUrl String?
-  active   Boolean @default(true)
-  barberShop    BarberShop      @relation(fields: [barberShopId], references: [id])
-  barberShopId  Int
-  services      Service[]       @relation("BarberServices")
-  Appointment   Appointment[]
+  id           Int            @id @default(autoincrement())
+  name         String
+  fone         String
+  role         role           @default(Barber)
+  email        String?
+  imageUrl     String?
+  active       Boolean        @default(true)
+  barberShop   BarberShop     @relation(fields: [barberShopId], references: [id])
+  barberShopId Int
+  services     Service[]      @relation("BarberServices")
+  Appointment  Appointment[]
   WorkSchedule WorkSchedule[]
-  TimeOff TimeOff[]
+  TimeOff      TimeOff[]
 }
 
 model Service {
@@ -63,7 +63,7 @@ model Service {
   name         String
   price        Float
   duration     Int // Duração em minutos
-  active       Boolean @default(true)
+  active       Boolean       @default(true)
   barberShop   BarberShop    @relation(fields: [barberShopId], references: [id])
   barberShopId Int
   barbers      Barber[]      @relation("BarberServices")
@@ -73,8 +73,8 @@ model Service {
 model Appointment {
   id              Int               @id @default(autoincrement())
   appointmentDate DateTime
-  clientName     String
-  clientFone     String
+  clientName      String
+  clientFone      String
   status          appointmentStatus @default(Agendado)
   barber          Barber            @relation(fields: [barberId], references: [id])
   barberId        Int
@@ -82,19 +82,17 @@ model Appointment {
 }
 
 model WorkSchedule {
-  id          Int    @id @default(autoincrement())
-  barberId    Int
-  barber      Barber @relation(fields: [barberId], references: [id])
-  dayOfWeek days
-  startHour  String
-  endHour    String
+  id       Int    @id @default(autoincrement())
+  barberId Int
+  barber   Barber @relation(fields: [barberId], references: [id])
+  schedule Json
 }
 
 model TimeOff {
-  id          Int    @id @default(autoincrement())
-  barberId    Int
-  barber      Barber @relation(fields: [barberId], references: [id])
+  id        Int    @id @default(autoincrement())
+  barberId  Int
+  barber    Barber @relation(fields: [barberId], references: [id])
   dayOfWeek days
-  startHour  String
-  endHour    String
+  startHour String
+  endHour   String
 }

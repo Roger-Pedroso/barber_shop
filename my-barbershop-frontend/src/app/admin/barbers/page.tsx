@@ -20,9 +20,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Pencil2Icon } from "@radix-ui/react-icons";
+import { ActivityLogIcon, Pencil2Icon } from "@radix-ui/react-icons";
 import { useEffect, useState } from "react";
 import { Servico } from "../services/page";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export interface Barbeiro {
   id: number;
@@ -46,11 +47,41 @@ export interface newBarber {
 }
 
 export default function Barbeiros() {
+  const getAvailableTimes = () => {
+    const times = [];
+    const start = 7; // Horário de início (8h)
+    const end = 21; // Horário de término (18h)
+    for (let i = start; i < end; i++) {
+      times.push({ label: `${i}:00`, checked: Boolean(true) });
+      times.push({ label: `${i}:30`, checked: Boolean(true) });
+    }
+    return times;
+    // setAvailableTimes(times);
+  };
+
   const [servicos, setServicos] = useState<Servico[]>([]);
 
   const [barbeiros, setBarbeiros] = useState<Barbeiro[]>([]);
   const [newBarber, setNewBarber] = useState<newBarber | null>(null);
   const [barberToUpdate, setBarberToUpdate] = useState<Barbeiro | null>(null);
+
+  const [days, setDays] = useState<
+    {
+      label: string;
+      checked: boolean;
+      times: { label: string; checked: boolean }[];
+    }[]
+  >([
+    { label: "segunda", checked: true, times: getAvailableTimes() },
+    { label: "terca", checked: true, times: getAvailableTimes() },
+    { label: "quarta", checked: true, times: getAvailableTimes() },
+    { label: "quinta", checked: true, times: getAvailableTimes() },
+    { label: "sexta", checked: true, times: getAvailableTimes() },
+    { label: "sabado", checked: true, times: getAvailableTimes() },
+    { label: "domingo", checked: false, times: getAvailableTimes() },
+  ]);
+
+  console.log("time", days);
 
   const fetchBarbeiros = async (): Promise<Barbeiro[]> => {
     const res = await fetch("http://localhost:3001/barbers");
@@ -416,6 +447,146 @@ export default function Barbeiros() {
                                   }}
                                 >
                                   Continuar
+                                </Button>
+                              </DialogTrigger>
+                            </div>
+                          </div>
+                        </DialogDescription>
+                      </DialogHeader>
+                    </DialogContent>
+                  </Dialog>
+                  <Dialog>
+                    <DialogTrigger>
+                      <Button
+                        variant={"outline"}
+                        onClick={() => {
+                          console.log("barbeiro", barbeiro);
+
+                          setBarberToUpdate(barbeiro);
+                        }}
+                      >
+                        <ActivityLogIcon />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent style={{ maxWidth: "60%" }}>
+                      <DialogHeader>
+                        <DialogTitle>Agenda</DialogTitle>
+                        <DialogDescription>
+                          <div>
+                            <p>sad</p>
+                            <div className="flex gap-3">
+                              {days.map((day) => {
+                                return (
+                                  <div key={day.label}>
+                                    <div
+                                      key={day.label + day.checked}
+                                      className="flex items-center space-x-2"
+                                    >
+                                      <Checkbox
+                                        id={day.label}
+                                        checked={day.checked}
+                                        onCheckedChange={(checked) => {
+                                          console.log("checked", checked);
+
+                                          setDays(
+                                            days.map((d) => {
+                                              if (d.label === day.label) {
+                                                return {
+                                                  ...d,
+                                                  checked: Boolean(checked),
+                                                };
+                                              }
+                                              return d;
+                                            })
+                                          );
+                                        }}
+                                      />
+                                      <label
+                                        htmlFor={day.label}
+                                        className="capitalize text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                      >
+                                        {day.label}
+                                      </label>
+                                    </div>
+                                    <div className="flex flex-col gap-2 pt-4">
+                                      {day.times.map((t) => {
+                                        return (
+                                          <div
+                                            key={t.label + t.checked}
+                                            className="flex items-center space-x-2"
+                                          >
+                                            <Checkbox
+                                              id={t.label}
+                                              checked={t.checked}
+                                              onCheckedChange={(checked) => {
+                                                console.log("checked", checked);
+
+                                                setDays(
+                                                  days.map((d) => {
+                                                    if (d.label === day.label) {
+                                                      return {
+                                                        ...d,
+                                                        times: d.times.map(
+                                                          (ts) => {
+                                                            if (
+                                                              ts.label ===
+                                                              t.label
+                                                            ) {
+                                                              return {
+                                                                ...ts,
+                                                                checked:
+                                                                  Boolean(
+                                                                    checked
+                                                                  ),
+                                                              };
+                                                            }
+                                                            return ts;
+                                                          }
+                                                        ),
+                                                      };
+                                                    }
+                                                    return d;
+                                                  })
+                                                );
+                                              }}
+                                            />
+                                            <label
+                                              htmlFor={t.label}
+                                              className="capitalize text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                            >
+                                              {t.label}
+                                            </label>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignSelf: "end",
+                              gap: "10px",
+                              marginTop: "20px",
+                            }}
+                          >
+                            <div>
+                              <DialogTrigger>
+                                <Button
+                                  variant={"secondary"}
+                                  onClick={() => {}}
+                                >
+                                  Cancelar
+                                </Button>
+                              </DialogTrigger>
+                            </div>
+                            <div>
+                              <DialogTrigger>
+                                <Button onClick={() => {}}>
+                                  Salvar Agenda
                                 </Button>
                               </DialogTrigger>
                             </div>
