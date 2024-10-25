@@ -3,6 +3,7 @@ import { Controller, Get, Post, Body, Put, Param } from '@nestjs/common';
 import { BarberService } from './barber.service';
 import { Barber } from '@prisma/client';
 import { UpdateBarberDto } from './dto/update-barber.dto';
+import { UpdateBarberScheduleDto } from './dto/update-barber-schedule.dto';
 
 @Controller('barbers')
 export class BarberController {
@@ -35,5 +36,14 @@ export class BarberController {
     @Param('id') id: string,
   ): Promise<Barber> {
     return this.barberService.update(Number(id), barberData);
+  }
+
+  @Put(':id/schedule')
+  async updateSchedule(
+    @Body()
+    barberData: UpdateBarberScheduleDto,
+    @Param('id') id: string,
+  ): Promise<Barber> {
+    return this.barberService.updateSchedule(Number(id), barberData);
   }
 }

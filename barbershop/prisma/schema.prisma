@@ -43,18 +43,18 @@ model BarberShop {
 }
 
 model Barber {
-  id           Int            @id @default(autoincrement())
+  id           Int           @id @default(autoincrement())
   name         String
   fone         String
-  role         role           @default(Barber)
+  role         role          @default(Barber)
   email        String?
   imageUrl     String?
-  active       Boolean        @default(true)
-  barberShop   BarberShop     @relation(fields: [barberShopId], references: [id])
+  active       Boolean       @default(true)
+  barberShop   BarberShop    @relation(fields: [barberShopId], references: [id])
   barberShopId Int
-  services     Service[]      @relation("BarberServices")
+  schedule     Json          @default(dbgenerated("'[]'::jsonb"))
+  services     Service[]     @relation("BarberServices")
   Appointment  Appointment[]
-  WorkSchedule WorkSchedule[]
   TimeOff      TimeOff[]
 }
 
@@ -79,13 +79,6 @@ model Appointment {
   barber          Barber            @relation(fields: [barberId], references: [id])
   barberId        Int
   services        Service[]         @relation("AppointmentServices")
-}
-
-model WorkSchedule {
-  id       Int    @id @default(autoincrement())
-  barberId Int
-  barber   Barber @relation(fields: [barberId], references: [id])
-  schedule Json
 }
 
 model TimeOff {

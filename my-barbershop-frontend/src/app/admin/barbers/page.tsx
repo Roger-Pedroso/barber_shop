@@ -25,6 +25,13 @@ import { useEffect, useState } from "react";
 import { Servico } from "../services/page";
 import { Checkbox } from "@/components/ui/checkbox";
 
+interface Schedule {
+  id: number;
+  label: string;
+  checked: boolean;
+  times: { label: string; checked: boolean }[];
+}
+
 export interface Barbeiro {
   id: number;
   name: string;
@@ -34,6 +41,7 @@ export interface Barbeiro {
   email: string;
   fone: string;
   active: boolean;
+  schedule: Schedule[];
   services: Servico[];
 }
 
@@ -48,15 +56,29 @@ export interface newBarber {
 
 export default function Barbeiros() {
   const getAvailableTimes = () => {
-    const times = [];
-    const start = 7; // Horário de início (8h)
-    const end = 21; // Horário de término (18h)
-    for (let i = start; i < end; i++) {
-      times.push({ label: `${i}:00`, checked: Boolean(true) });
-      times.push({ label: `${i}:30`, checked: Boolean(true) });
-    }
-    return times;
-    // setAvailableTimes(times);
+    const getHours = () => {
+      const times = [];
+      const start = 7; // Horário de início (8h)
+      const end = 21; // Horário de término (18h)
+      for (let i = start; i < end; i++) {
+        times.push({ label: `${i}:00`, checked: Boolean(true) });
+        times.push({ label: `${i}:30`, checked: Boolean(true) });
+      }
+      return times;
+      // setAvailableTimes(times);
+    };
+
+    const getDays = [
+      { id: 0, label: "segunda", checked: true, times: getHours() },
+      { id: 1, label: "terca", checked: true, times: getHours() },
+      { id: 2, label: "quarta", checked: true, times: getHours() },
+      { id: 3, label: "quinta", checked: true, times: getHours() },
+      { id: 4, label: "sexta", checked: true, times: getHours() },
+      { id: 5, label: "sabado", checked: true, times: getHours() },
+      { id: 6, label: "domingo", checked: false, times: getHours() },
+    ];
+
+    return getDays;
   };
 
   const [servicos, setServicos] = useState<Servico[]>([]);
@@ -65,29 +87,28 @@ export default function Barbeiros() {
   const [newBarber, setNewBarber] = useState<newBarber | null>(null);
   const [barberToUpdate, setBarberToUpdate] = useState<Barbeiro | null>(null);
 
-  const [days, setDays] = useState<
-    {
-      label: string;
-      checked: boolean;
-      times: { label: string; checked: boolean }[];
-    }[]
-  >([
-    { label: "segunda", checked: true, times: getAvailableTimes() },
-    { label: "terca", checked: true, times: getAvailableTimes() },
-    { label: "quarta", checked: true, times: getAvailableTimes() },
-    { label: "quinta", checked: true, times: getAvailableTimes() },
-    { label: "sexta", checked: true, times: getAvailableTimes() },
-    { label: "sabado", checked: true, times: getAvailableTimes() },
-    { label: "domingo", checked: false, times: getAvailableTimes() },
-  ]);
+  const days = getAvailableTimes();
 
-  console.log("time", days);
+  console.log("BARBERS", barbeiros);
 
   const fetchBarbeiros = async (): Promise<Barbeiro[]> => {
     const res = await fetch("http://localhost:3001/barbers");
     const data = await res.json();
+    console.log("Barbeiros", data);
 
-    setBarbeiros(data);
+    const parsedData = data.map((barbeiro: Barbeiro) => {
+      if (barbeiro.schedule.length === 0) {
+        return {
+          ...barbeiro,
+          schedule: days,
+        };
+      }
+
+      return barbeiro;
+    });
+
+    setBarbeiros(parsedData);
+    console.log("XXX", parsedData);
     return data;
   };
 
@@ -103,6 +124,7 @@ export default function Barbeiros() {
 
     const barbeirosParsed = barbersData.map((barbeiro) => ({
       ...barbeiro,
+      schedule: barbeiro.schedule.length === 0 ? days : barbeiro.schedule,
       services: servicos.map((servico) => ({
         ...servico,
         checked: barbeiro.services.some(
@@ -199,6 +221,32 @@ export default function Barbeiros() {
       }
     } catch (error) {
       console.log("Erro ao criar barbeiro", error);
+    }
+  };
+
+  const handleSaveSchedule = async (id: number, schedule: Schedule[]) => {
+    const barberScheduleData = {
+      schedule,
+    };
+
+    console.log("barberScheduleData", barberScheduleData, id);
+    // return;
+    try {
+      const res = await fetch(`http://localhost:3001/barbers/${id}/schedule`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(barberScheduleData),
+      });
+
+      if (res.status === 200) {
+        setBarberToUpdate(null);
+        await fetchBarbeiros();
+        parseBarbeiros();
+      }
+    } catch (error) {
+      console.log("Erro ao salva agenda do barbeiro", error);
     }
   };
 
@@ -475,7 +523,7 @@ export default function Barbeiros() {
                           <div>
                             <p>sad</p>
                             <div className="flex gap-3">
-                              {days.map((day) => {
+                              {barberToUpdate?.schedule.map((day) => {
                                 return (
                                   <div key={day.label}>
                                     <div
@@ -486,19 +534,23 @@ export default function Barbeiros() {
                                         id={day.label}
                                         checked={day.checked}
                                         onCheckedChange={(checked) => {
-                                          console.log("checked", checked);
+                                          console.log("SAD", checked);
 
-                                          setDays(
-                                            days.map((d) => {
-                                              if (d.label === day.label) {
-                                                return {
-                                                  ...d,
-                                                  checked: Boolean(checked),
-                                                };
-                                              }
-                                              return d;
-                                            })
-                                          );
+                                          setBarberToUpdate({
+                                            ...barberToUpdate,
+                                            schedule:
+                                              barberToUpdate.schedule.map(
+                                                (d) => {
+                                                  if (d.id === day.id) {
+                                                    return {
+                                                      ...d,
+                                                      checked: Boolean(checked),
+                                                    };
+                                                  }
+                                                  return d;
+                                                }
+                                              ),
+                                          });
                                         }}
                                       />
                                       <label
@@ -521,32 +573,43 @@ export default function Barbeiros() {
                                               onCheckedChange={(checked) => {
                                                 console.log("checked", checked);
 
-                                                setDays(
-                                                  days.map((d) => {
-                                                    if (d.label === day.label) {
-                                                      return {
-                                                        ...d,
-                                                        times: d.times.map(
-                                                          (ts) => {
-                                                            if (
-                                                              ts.label ===
-                                                              t.label
-                                                            ) {
-                                                              return {
-                                                                ...ts,
-                                                                checked:
-                                                                  Boolean(
-                                                                    checked
-                                                                  ),
-                                                              };
+                                                setBarberToUpdate((prev) =>
+                                                  prev
+                                                    ? {
+                                                        ...prev,
+                                                        schedule:
+                                                          barberToUpdate.schedule.map(
+                                                            (d) => {
+                                                              if (
+                                                                d.id === day.id
+                                                              ) {
+                                                                return {
+                                                                  ...d,
+                                                                  times:
+                                                                    d.times.map(
+                                                                      (ts) => {
+                                                                        if (
+                                                                          ts.label ===
+                                                                          t.label
+                                                                        ) {
+                                                                          return {
+                                                                            ...ts,
+                                                                            checked:
+                                                                              Boolean(
+                                                                                checked
+                                                                              ),
+                                                                          };
+                                                                        }
+                                                                        return ts;
+                                                                      }
+                                                                    ),
+                                                                };
+                                                              }
+                                                              return d;
                                                             }
-                                                            return ts;
-                                                          }
-                                                        ),
-                                                      };
-                                                    }
-                                                    return d;
-                                                  })
+                                                          ),
+                                                      }
+                                                    : null
                                                 );
                                               }}
                                             />
@@ -585,7 +648,14 @@ export default function Barbeiros() {
                             </div>
                             <div>
                               <DialogTrigger>
-                                <Button onClick={() => {}}>
+                                <Button
+                                  onClick={() =>
+                                    handleSaveSchedule(
+                                      barbeiro.id,
+                                      barberToUpdate?.schedule
+                                    )
+                                  }
+                                >
                                   Salvar Agenda
                                 </Button>
                               </DialogTrigger>

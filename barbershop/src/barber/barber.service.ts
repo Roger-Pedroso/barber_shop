@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { Barber } from '@prisma/client';
 import { UpdateBarberDto } from './dto/update-barber.dto';
+import { UpdateBarberScheduleDto } from './dto/update-barber-schedule.dto';
 
 @Injectable()
 export class BarberService {
@@ -70,6 +71,16 @@ export class BarberService {
           connect: servicesToConnect.map((id) => ({ id })),
         },
       },
+    });
+  }
+
+  async updateSchedule(
+    id: number,
+    data: UpdateBarberScheduleDto,
+  ): Promise<Barber> {
+    return this.prisma.barber.update({
+      where: { id },
+      data,
     });
   }
 }
