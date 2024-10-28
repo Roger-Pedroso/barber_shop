@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Barbeiro } from "./admin/barbers/page";
 import { Servico } from "./admin/services/page";
+import { Label } from "@/components/ui/label";
 
 export interface Barbearia {
   id: number;
@@ -32,6 +33,16 @@ export default function Agendamento() {
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [clientName, setClientName] = useState("");
   const [clientFone, setClientFone] = useState("");
+
+  const diasDaSemana = [
+    "Domingo",
+    "Segunda-feira",
+    "Terça-feira",
+    "Quarta-feira",
+    "Quinta-feira",
+    "Sexta-feira",
+    "Sábado",
+  ];
 
   // cadastrar agendamento
   const handleAgendamento = async () => {
@@ -98,7 +109,10 @@ export default function Agendamento() {
     for (let i = 0; i <= 14; i++) {
       const date = new Date(today);
       date.setDate(today.getDate() + i);
-      dates.push(date);
+
+      const dateFormated = { date: date, dayWeek: diasDaSemana[date.getDay()] };
+
+      dates.push(dateFormated);
     }
     return dates;
   };
@@ -389,17 +403,20 @@ export default function Agendamento() {
                   <Button
                     key={date.toString()}
                     style={{
-                      backgroundColor: compararDatas(date, selectedDate)
+                      backgroundColor: compararDatas(date.date, selectedDate)
                         ? "white"
                         : "gray",
                     }}
                     onClick={() => {
                       setSelectedHour(null);
-                      setSelectedDate(date);
+                      setSelectedDate(date.date);
                       getAvailableTimes();
                     }}
                   >
-                    {date.toLocaleDateString()}
+                    <Label>
+                      {date.date.toLocaleDateString()}
+                      <br />({date.dayWeek})
+                    </Label>
                   </Button>
                 ))}
               </div>

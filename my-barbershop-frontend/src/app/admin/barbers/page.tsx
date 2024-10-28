@@ -69,13 +69,13 @@ export default function Barbeiros() {
     };
 
     const getDays = [
-      { id: 0, label: "segunda", checked: true, times: getHours() },
-      { id: 1, label: "terca", checked: true, times: getHours() },
-      { id: 2, label: "quarta", checked: true, times: getHours() },
-      { id: 3, label: "quinta", checked: true, times: getHours() },
-      { id: 4, label: "sexta", checked: true, times: getHours() },
-      { id: 5, label: "sabado", checked: true, times: getHours() },
-      { id: 6, label: "domingo", checked: false, times: getHours() },
+      { id: 0, label: "domingo", checked: false, times: getHours() },
+      { id: 1, label: "segunda", checked: true, times: getHours() },
+      { id: 2, label: "terca", checked: true, times: getHours() },
+      { id: 3, label: "quarta", checked: true, times: getHours() },
+      { id: 4, label: "quinta", checked: true, times: getHours() },
+      { id: 5, label: "sexta", checked: true, times: getHours() },
+      { id: 6, label: "sabado", checked: true, times: getHours() },
     ];
 
     return getDays;
@@ -224,7 +224,10 @@ export default function Barbeiros() {
     }
   };
 
-  const handleSaveSchedule = async (id: number, schedule: Schedule[]) => {
+  const handleSaveSchedule = async (
+    id: number,
+    schedule: Schedule[] | undefined
+  ) => {
     const barberScheduleData = {
       schedule,
     };
