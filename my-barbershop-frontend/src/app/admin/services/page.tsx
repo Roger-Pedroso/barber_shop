@@ -23,7 +23,7 @@ import {
 import { Pencil2Icon } from "@radix-ui/react-icons";
 import { useEffect, useState } from "react";
 
-export interface Servico {
+export interface Service {
   id: number;
   name: string;
   price: string;
@@ -39,9 +39,9 @@ export interface newService {
 }
 
 export default function Servicos() {
-  const [servicos, setServicos] = useState<Servico[]>([]);
+  const [servicos, setServicos] = useState<Service[]>([]);
   const [newService, setNewService] = useState<newService | null>(null);
-  const [serviceToUpdate, setServiceToUpdate] = useState<Servico | null>(null);
+  const [serviceToUpdate, setServiceToUpdate] = useState<Service | null>(null);
 
   const fetchServicos = async () => {
     const res = await fetch("http://localhost:3001/barber-service");
@@ -55,7 +55,7 @@ export default function Servicos() {
   }, []);
 
   const updateServiceField = (
-    field: keyof Servico,
+    field: keyof Service,
     value: string | boolean
   ) => {
     setServiceToUpdate((prevService) =>
@@ -64,7 +64,7 @@ export default function Servicos() {
   };
 
   const updateNewServiceField = (
-    field: keyof Servico,
+    field: keyof Service,
     value: string | boolean
   ) => {
     setNewService((prevService) =>

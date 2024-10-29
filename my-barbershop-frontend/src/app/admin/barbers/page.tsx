@@ -22,17 +22,17 @@ import {
 } from "@/components/ui/table";
 import { ActivityLogIcon, Pencil2Icon } from "@radix-ui/react-icons";
 import { useEffect, useState } from "react";
-import { Servico } from "../services/page";
+import { Service } from "../services/page";
 import { Checkbox } from "@/components/ui/checkbox";
 
-interface Schedule {
+export interface Schedule {
   id: number;
   label: string;
   checked: boolean;
   times: { label: string; checked: boolean }[];
 }
 
-export interface Barbeiro {
+export interface Barber {
   id: number;
   name: string;
   barberShopId: number;
@@ -42,7 +42,7 @@ export interface Barbeiro {
   fone: string;
   active: boolean;
   schedule: Schedule[];
-  services: Servico[];
+  services: Service[];
 }
 
 export interface newBarber {
@@ -81,22 +81,22 @@ export default function Barbeiros() {
     return getDays;
   };
 
-  const [servicos, setServicos] = useState<Servico[]>([]);
+  const [servicos, setServicos] = useState<Service[]>([]);
 
-  const [barbeiros, setBarbeiros] = useState<Barbeiro[]>([]);
+  const [barbeiros, setBarbeiros] = useState<Barber[]>([]);
   const [newBarber, setNewBarber] = useState<newBarber | null>(null);
-  const [barberToUpdate, setBarberToUpdate] = useState<Barbeiro | null>(null);
+  const [barberToUpdate, setBarberToUpdate] = useState<Barber | null>(null);
 
   const days = getAvailableTimes();
 
   console.log("BARBERS", barbeiros);
 
-  const fetchBarbeiros = async (): Promise<Barbeiro[]> => {
+  const fetchBarbeiros = async (): Promise<Barber[]> => {
     const res = await fetch("http://localhost:3001/barbers");
     const data = await res.json();
     console.log("Barbeiros", data);
 
-    const parsedData = data.map((barbeiro: Barbeiro) => {
+    const parsedData = data.map((barbeiro: Barber) => {
       if (barbeiro.schedule.length === 0) {
         return {
           ...barbeiro,
@@ -146,17 +146,14 @@ export default function Barbeiros() {
     parseBarbeiros();
   }, [servicos]);
 
-  const updateBarberField = (
-    field: keyof Barbeiro,
-    value: string | boolean
-  ) => {
+  const updateBarberField = (field: keyof Barber, value: string | boolean) => {
     setBarberToUpdate((prevService) =>
       prevService ? { ...prevService, [field]: value } : null
     );
   };
 
   const updateNewBarberField = (
-    field: keyof Barbeiro,
+    field: keyof Barber,
     value: string | boolean
   ) => {
     setNewBarber((prevService) =>

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { useEffect, useState } from "react";
 
-enum AppointmentStatus {
+export enum AppointmentStatus {
   Agendado = "Agendado",
   Finalizado = "Finalizado",
   Cancelado = "Cancelado",
@@ -19,7 +19,7 @@ enum AppointmentStatus {
 export interface Appointment {
   id: number;
   appointmentDate: Date;
-  barberId: string;
+  barberId: number;
   status: AppointmentStatus;
   clientFone: string;
   clientName: string;
