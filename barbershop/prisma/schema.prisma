@@ -73,6 +73,8 @@ model Service {
 model Appointment {
   id              Int               @id @default(autoincrement())
   appointmentDate DateTime
+  startTime       String
+  endTime         String
   clientName      String
   clientFone      String
   status          appointmentStatus @default(Agendado)

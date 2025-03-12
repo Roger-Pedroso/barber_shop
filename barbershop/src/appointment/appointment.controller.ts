@@ -1,5 +1,5 @@
 // src/appointment/appointment.controller.ts
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query } from '@nestjs/common';
 import { AppointmentService } from './appointment.service';
 import { Appointment } from '@prisma/client';
 
@@ -15,6 +15,8 @@ export class AppointmentController {
       barberId: number;
       clientName: string;
       clientFone: string;
+      startTime: string;
+      endTime: string;
       serviceIds: number[];
     },
   ): Promise<Appointment> {
@@ -24,5 +26,20 @@ export class AppointmentController {
   @Get()
   async findAll(): Promise<Appointment[]> {
     return this.appointmentService.findAll();
+  }
+
+  @Get('/available-slots')
+  async getAvailableSlots(
+    @Query('barberId') barberId: string,
+    @Query('date') date: string,
+    @Query('serviceIds') serviceIds: string,
+  ): Promise<any> {
+    const serviceIdsParsed = JSON.parse(serviceIds);
+
+    return this.appointmentService.getAvailableSlots(
+      Number(barberId),
+      date,
+      serviceIdsParsed,
+    );
   }
 }
