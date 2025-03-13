@@ -1,9 +1,10 @@
 import { Barber, Schedule } from "@/app/admin/barbers/page";
 import { Card } from "../ui/card";
-import { Appointment, AppointmentStatus } from "@/app/admin/appointments/page";
+import { Appointment } from "@/app/admin/appointments/page";
 import { Button } from "../ui/button";
 import { compareDates } from "@/utils/timeUtils";
 import { Label } from "@radix-ui/react-label";
+import { Service } from "@/app/admin/services/page";
 
 interface StepDateProps {
   schedules: Schedule[];
@@ -14,11 +15,11 @@ interface StepDateProps {
   onSelectDate: (date: Date) => void;
   selectedDate: Date | null;
   availableTimes: string[];
-  setAvailableTimes: (availableTimes: string[]) => void;
   selectedTime: string | null;
   onSelectTime: (selectedTime: string | null) => void;
   onNextStep: () => void;
   onBackStep: () => void;
+  selectedServices: Service[];
 }
 
 export const StepDate: React.FC<StepDateProps> = (props) => {
@@ -32,69 +33,19 @@ export const StepDate: React.FC<StepDateProps> = (props) => {
     "Sábado",
   ];
 
-  function generateAvailableTimes(
-    schedules: Schedule[],
-    appointments: Appointment[],
-    barberId: number
-  ): { date: Date; availableTimes: string[]; dayWeek: string }[] {
-    const availableTimes: {
-      date: Date;
-      availableTimes: string[];
-      dayWeek: string;
-    }[] = [];
-    const now = new Date();
+  const getNext14Days = () => {
+    const today = new Date();
 
-    // Iterar pelos próximos 15 dias
-    for (let i = 0; i < 15; i++) {
-      const currentDate = new Date(now);
-      currentDate.setDate(now.getDate() + i);
+    return Array.from({ length: 14 }, (_, i) => {
+      const futureDate = new Date();
+      futureDate.setDate(today.getDate() + i);
 
-      // Encontrar o dia da semana (0 = Domingo, 1 = Segunda, ..., 6 = Sábado)
-      const dayOfWeek = currentDate.getDay();
-
-      // Encontrar a agenda do barbeiro para o dia atual
-      const scheduleForDay = schedules.find(
-        (schedule) => schedule.id === dayOfWeek
-      );
-      if (!scheduleForDay || !scheduleForDay.checked) continue;
-
-      // Filtrar horários ocupados para o dia atual e o barbeiro específico
-      const appointmentsForDay = appointments.filter((appointment) => {
-        return (
-          appointment.barberId === barberId &&
-          appointment.status === AppointmentStatus.Agendado &&
-          new Date(appointment.appointmentDate).toDateString() ===
-            currentDate.toDateString()
-        );
-      });
-
-      // Criar uma lista de horários disponíveis
-      const dayAvailableTimes = scheduleForDay.times
-        .filter((time) => time.checked)
-        .filter((time) => {
-          // Verificar se o horário já está ocupado
-          const timeLabel = time.label;
-          return !appointmentsForDay.some((appointment) => {
-            const appointmentTime = new Date(appointment.appointmentDate)
-              .toTimeString()
-              .slice(0, 5);
-            return appointmentTime === timeLabel;
-          });
-        })
-        .map((time) => time.label);
-
-      // Adicionar horários disponíveis para o dia atual, se houver
-      if (dayAvailableTimes.length > 0) {
-        availableTimes.push({
-          date: currentDate,
-          dayWeek: diasDaSemana[currentDate.getDay()],
-          availableTimes: dayAvailableTimes,
-        });
-      }
-    }
-
-    return availableTimes;
-  }
+      return {
+        date: futureDate,
+        dayOfWeek: diasDaSemana[futureDate.getDay()],
+      };
+    });
+  };
 
   return (
     <Card
@@ -120,12 +71,8 @@ export const StepDate: React.FC<StepDateProps> = (props) => {
           }}
         >
           <div className="grid grid-cols-3 gap-2">
-            {generateAvailableTimes(
-              props.selectedBarber?.schedule ?? [],
-              props.appointments,
-              props.selectedBarber?.id ?? 0
-            ).map((time1) => (
-              <div key={time1.dayWeek}>
+            {getNext14Days().map((time1) => (
+              <div key={time1.dayOfWeek}>
                 <Button
                   key={time1.toString()}
                   style={{
@@ -140,12 +87,11 @@ export const StepDate: React.FC<StepDateProps> = (props) => {
                   onClick={() => {
                     props.onSelectTime(null);
                     props.onSelectDate(time1.date);
-                    props.setAvailableTimes(time1.availableTimes);
                   }}
                 >
                   <Label>
                     {time1.date.toLocaleDateString()}
-                    <br />({time1.dayWeek})
+                    <br />({time1.dayOfWeek})
                   </Label>
                 </Button>
               </div>

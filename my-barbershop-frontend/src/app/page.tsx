@@ -1,12 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Barber } from "./admin/barbers/page";
-import { Appointment, AppointmentStatus } from "./admin/appointments/page";
+import { Appointment } from "./admin/appointments/page";
 import { StepAttendant } from "@/components/clientAppointment/StepAttendant";
 import { StepServices } from "@/components/clientAppointment/StepServices";
 import { StepDate } from "@/components/clientAppointment/StepDate";
@@ -42,19 +41,45 @@ export default function Agendamento() {
 
   const [appointments, setAppointments] = useState<Appointment[]>([]);
 
+  const addMinutesToTime = (timeStr: string, minutesToAdd: number) => {
+    const [hours, minutes] = timeStr.split(":").map(Number);
+    const date = new Date();
+
+    date.setHours(hours);
+    date.setMinutes(minutes + minutesToAdd);
+
+    const newHours = String(date.getHours()).padStart(2, "0");
+    const newMinutes = String(date.getMinutes()).padStart(2, "0");
+
+    return `${newHours}:${newMinutes}`;
+  };
+
+  const formatDateLocal = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const saveAppointment = async () => {
     try {
-      const [horas, minutos] = selectedHour!.split(":");
+      const serviceTime = selectedServicos.reduce(
+        (acc: number, service: Service) =>
+          Number(acc) + Number(service.duration),
+        0
+      );
+      const endTimeParsed = addMinutesToTime(selectedHour!, serviceTime);
+      console.log("ENVIADO", selectedDate);
 
       const data = {
         barberId: selectedBarbeiro?.id,
         serviceIds: selectedServicos.map((servico) => servico.id),
-        appointmentDate: new Date(
-          selectedDate!.setHours(Number(horas), Number(minutos), 0)
-        ),
+        appointmentDate: selectedDate,
         clientName,
         clientFone,
-        service_status: AppointmentStatus.Agendado,
+        startTime: selectedHour,
+        endTime: endTimeParsed,
+        // service_status: AppointmentStatus.Agendado,
       };
 
       const res = await fetch("http://localhost:3001/appointments", {
@@ -73,10 +98,28 @@ export default function Agendamento() {
   };
 
   useEffect(() => {
+    const fetchAvailableTimes = async () => {
+      const barber = selectedBarbeiro?.id;
+      const date = selectedDate && formatDateLocal(selectedDate);
+      const services = selectedServicos.map((service) => service.id);
+
+      const res = await fetch(
+        `http://localhost:3001/appointments/available-slots?barberId=${barber}&date=${date}&serviceIds=[${services}]`
+      );
+      const data = await res.json();
+
+      setAvailableTimes(data);
+    };
+
+    if (selectedBarbeiro && selectedDate && selectedServicos.length > 0) {
+      fetchAvailableTimes();
+    }
+  }, [selectedBarbeiro, selectedDate, selectedServicos]);
+
+  useEffect(() => {
     const fetchAppointments = async () => {
       const res = await fetch("http://localhost:3001/appointments");
       const data = await res.json();
-      console.log("appointments", data);
 
       setAppointments(data);
     };
@@ -84,7 +127,6 @@ export default function Agendamento() {
     async function fetchBarbeiros() {
       const res = await fetch("http://localhost:3001/barbers");
       const data = await res.json();
-      console.log("data", data);
 
       setBarbeiros(data);
     }
@@ -92,7 +134,6 @@ export default function Agendamento() {
     async function fetchBarbearia() {
       const res = await fetch("http://localhost:3001/barbershop/1");
       const data = await res.json();
-      console.log("barbearia", data);
 
       setBarbearia(data);
     }
@@ -226,8 +267,8 @@ export default function Agendamento() {
           availableTimes={availableTimes}
           barberId={selectedBarbeiro?.id}
           selectedBarber={selectedBarbeiro}
+          selectedServices={selectedServicos}
           schedules={selectedBarbeiro?.schedule ?? []}
-          setAvailableTimes={setAvailableTimes}
           setSelectedBarber={setSelectedBarbeiro}
           selectedTime={selectedHour}
           onSelectTime={setSelectedHour}
