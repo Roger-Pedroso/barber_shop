@@ -54,5 +54,14 @@
 ![image](https://github.com/user-attachments/assets/2cb8a491-94e3-4ce4-97b6-2a650bbbd000)
 
 
+### Rodar Projeto 
+
+- Entrar na pasta barbershop (backend NestJS) 
+- Criar um arquivo .env na raiz com DATABASE_URL= com a conexao do banco
+- rodar npm install no terminal e npm run start
+
+- Entrar na pasta my-barbershop-frontend (frontend Next) 
+- Criar um arquivo .env na raiz com NEXT_PUBLIC_API_URL= com a conexao do backend padrao 3001
+- rodar npm install no terminal e npm run dev
 
 
