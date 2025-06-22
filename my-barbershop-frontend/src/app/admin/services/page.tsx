@@ -44,7 +44,9 @@ export default function Servicos() {
   const [serviceToUpdate, setServiceToUpdate] = useState<Service | null>(null);
 
   const fetchServicos = async () => {
-    const res = await fetch("http://localhost:3001/barber-service");
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/barber-service`
+    );
     const data = await res.json();
 
     setServicos(data);
@@ -80,13 +82,16 @@ export default function Servicos() {
       name: serviceToUpdate?.name,
     };
     try {
-      const res = await fetch(`http://localhost:3001/barber-service/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(dataToUpdate),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/barber-service/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(dataToUpdate),
+        }
+      );
 
       if (res.status === 200) {
         setServiceToUpdate(null);
@@ -106,13 +111,16 @@ export default function Servicos() {
     };
 
     try {
-      const res = await fetch("http://localhost:3001/barber-service", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newServiceData),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/barber-service`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newServiceData),
+        }
+      );
 
       if (res.status === 201) {
         setNewService(null);

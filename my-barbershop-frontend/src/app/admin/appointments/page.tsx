@@ -27,7 +27,7 @@ export interface Appointment {
 
 export default function Agendamentos() {
   const fetchAppointments = async () => {
-    const res = await fetch("http://localhost:3001/appointments");
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments`);
     const data = await res.json();
 
     setAppointments(data);

@@ -89,12 +89,9 @@ export default function Barbeiros() {
 
   const days = getAvailableTimes();
 
-  console.log("BARBERS", barbeiros);
-
   const fetchBarbeiros = async (): Promise<Barber[]> => {
-    const res = await fetch("http://localhost:3001/barbers");
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/barbers`);
     const data = await res.json();
-    console.log("Barbeiros", data);
 
     const parsedData = data.map((barbeiro: Barber) => {
       if (barbeiro.schedule.length === 0) {
@@ -108,12 +105,13 @@ export default function Barbeiros() {
     });
 
     setBarbeiros(parsedData);
-    console.log("XXX", parsedData);
     return data;
   };
 
   const fetchServicos = async () => {
-    const res = await fetch("http://localhost:3001/barber-service");
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/barber-service`
+    );
     const data = await res.json();
 
     setServicos(data);
@@ -174,13 +172,16 @@ export default function Barbeiros() {
     };
 
     try {
-      const res = await fetch(`http://localhost:3001/barbers/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(dataToUpdate),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/barbers/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(dataToUpdate),
+        }
+      );
 
       if (res.status === 200) {
         setBarberToUpdate(null);
@@ -198,13 +199,12 @@ export default function Barbeiros() {
       email: newBarber?.email,
       fone: newBarber?.fone,
       services: newBarber?.services,
-      imageUrl: "https://yex-web-s3.s3.sa-east-1.amazonaws.com/no-image.png",
-      barberShopId: 1, //TO DO PEGAR DO USUARIO LOGADO
+      imageUrl: "",
+      barberShopId: 1,
     };
-    console.log("newBarberData", newBarberData);
 
     try {
-      const res = await fetch("http://localhost:3001/barbers", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/barbers`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -229,16 +229,17 @@ export default function Barbeiros() {
       schedule,
     };
 
-    console.log("barberScheduleData", barberScheduleData, id);
-    // return;
     try {
-      const res = await fetch(`http://localhost:3001/barbers/${id}/schedule`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(barberScheduleData),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/barbers/${id}/schedule`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(barberScheduleData),
+        }
+      );
 
       if (res.status === 200) {
         setBarberToUpdate(null);
@@ -384,11 +385,7 @@ export default function Barbeiros() {
                     <DialogTrigger>
                       <Button
                         variant={"outline"}
-                        onClick={() => {
-                          console.log("barbeiro", barbeiro);
-
-                          setBarberToUpdate(barbeiro);
-                        }}
+                        onClick={() => setBarberToUpdate(barbeiro)}
                       >
                         <Pencil2Icon />
                       </Button>
@@ -507,11 +504,7 @@ export default function Barbeiros() {
                     <DialogTrigger>
                       <Button
                         variant={"outline"}
-                        onClick={() => {
-                          console.log("barbeiro", barbeiro);
-
-                          setBarberToUpdate(barbeiro);
-                        }}
+                        onClick={() => setBarberToUpdate(barbeiro)}
                       >
                         <ActivityLogIcon />
                       </Button>
@@ -534,8 +527,6 @@ export default function Barbeiros() {
                                         id={day.label}
                                         checked={day.checked}
                                         onCheckedChange={(checked) => {
-                                          console.log("SAD", checked);
-
                                           setBarberToUpdate({
                                             ...barberToUpdate,
                                             schedule:
@@ -571,8 +562,6 @@ export default function Barbeiros() {
                                               id={t.label}
                                               checked={t.checked}
                                               onCheckedChange={(checked) => {
-                                                console.log("checked", checked);
-
                                                 setBarberToUpdate((prev) =>
                                                   prev
                                                     ? {

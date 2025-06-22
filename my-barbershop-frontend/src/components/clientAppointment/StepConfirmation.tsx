@@ -76,7 +76,7 @@ export const StepConfirmation: React.FC<StepConfirmationProps> = (props) => {
                 onClick={props.onNextStep}
                 disabled={!props.clientName || !props.clientFone}
               >
-                Continuar
+                Salvar
               </Button>
             </div>
           </div>

@@ -57,9 +57,11 @@ export default function AdminLayout({ children }: RootLayoutProps) {
           </div>
         </div>
         <div className="p-3">
-          <Button variant="outline" size="icon">
-            <ResetIcon className="h-4 w-4" />
-          </Button>
+          <Link href="/">
+            <Button variant="outline" size="icon">
+              <ResetIcon className="h-4 w-4" />
+            </Button>
+          </Link>
         </div>
       </div>
       <div className="w-full" style={{ height: "100vh" }}>

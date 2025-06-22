@@ -4,7 +4,13 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: '"yex-web-s3.s3.sa-east-1.amazonaws.com"',
+        hostname: '"revistapesquisa.fapesp.br"',
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: '"static.vecteezy.com"',
         port: "",
         pathname: "/**",
       },

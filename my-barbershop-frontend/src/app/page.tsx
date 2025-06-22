@@ -11,6 +11,7 @@ import { StepServices } from "@/components/clientAppointment/StepServices";
 import { StepDate } from "@/components/clientAppointment/StepDate";
 import { StepConfirmation } from "@/components/clientAppointment/StepConfirmation";
 import { Service } from "./admin/services/page";
+import ConfirmationDialog from "@/components/clientAppointment/ConfirmationDialog";
 
 export interface Barbearia {
   id: number;
@@ -38,6 +39,10 @@ export default function Agendamento() {
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [clientName, setClientName] = useState("");
   const [clientFone, setClientFone] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [confirmationMessage, setConfirmationMessage] = useState<string>(
+    "Seu agendamento foi salvo com sucesso!"
+  );
 
   const [appointments, setAppointments] = useState<Appointment[]>([]);
 
@@ -69,7 +74,6 @@ export default function Agendamento() {
         0
       );
       const endTimeParsed = addMinutesToTime(selectedHour!, serviceTime);
-      console.log("ENVIADO", selectedDate);
 
       const data = {
         barberId: selectedBarbeiro?.id,
@@ -82,16 +86,26 @@ export default function Agendamento() {
         // service_status: AppointmentStatus.Agendado,
       };
 
-      const res = await fetch("http://localhost:3001/appointments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/appointments`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
 
       const result = await res.json();
-      console.log("result", result);
+
+      if (result) {
+        setConfirmationMessage(`Horário agendado para ${selectedDate?.toLocaleDateString(
+          "pt-BR"
+        )} as ${" "}
+          ${selectedHour}`);
+        setIsDialogOpen(true);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -104,7 +118,7 @@ export default function Agendamento() {
       const services = selectedServicos.map((service) => service.id);
 
       const res = await fetch(
-        `http://localhost:3001/appointments/available-slots?barberId=${barber}&date=${date}&serviceIds=[${services}]`
+        `${process.env.NEXT_PUBLIC_API_URL}/appointments/available-slots?barberId=${barber}&date=${date}&serviceIds=[${services}]`
       );
       const data = await res.json();
 
@@ -118,21 +132,25 @@ export default function Agendamento() {
 
   useEffect(() => {
     const fetchAppointments = async () => {
-      const res = await fetch("http://localhost:3001/appointments");
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/appointments`
+      );
       const data = await res.json();
 
       setAppointments(data);
     };
 
     async function fetchBarbeiros() {
-      const res = await fetch("http://localhost:3001/barbers");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/barbers`);
       const data = await res.json();
 
       setBarbeiros(data);
     }
 
     async function fetchBarbearia() {
-      const res = await fetch("http://localhost:3001/barbershop/1");
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/barbershop/1`
+      );
       const data = await res.json();
 
       setBarbearia(data);
@@ -159,15 +177,6 @@ export default function Agendamento() {
     } else if (step === 3) {
       setStep(4);
     } else if (step === 4) {
-      // Aqui você pode processar o agendamento
-      console.log({
-        selectedBarbeiro,
-        selectedServicos,
-        selectedDate,
-        clientName,
-        clientFone,
-        selectedHour,
-      });
       saveAppointment();
     }
   };
@@ -291,6 +300,14 @@ export default function Agendamento() {
           onBackStep={handleBack}
         />
       )}
+
+      <ConfirmationDialog
+        title="Confirmação"
+        message={confirmationMessage}
+        handleDialog={() => setIsDialogOpen((prev) => !prev)}
+        isOpen={isDialogOpen}
+        setStepOne={() => setStep(1)}
+      />
     </div>
   );
 }
